@@ -245,6 +245,11 @@ There are three separate checks that can refuse a question:
 No LangChain or LlamaIndex here. The keyword search, the rank fusion, and the
 whole evaluation setup are written directly.
 
+For the full version — how the timestamp mapping actually works, why chunking
+switches strategy on punctuation, how the cache keys are layered, and the
+reasoning behind each design call — see
+[docs/technical_walkthrough.md](docs/technical_walkthrough.md).
+
 ---
 
 ## Results

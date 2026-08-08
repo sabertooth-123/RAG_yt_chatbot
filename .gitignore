@@ -24,9 +24,7 @@ htmlcov/
 results/
 docs/eval_karpathy_*.md
 
-# Long-form docs kept locally, not published with the repo.
-# The PDF regenerates via scripts/build_walkthrough.py.
-docs/technical_walkthrough.md
+# The PDF regenerates from scripts/build_walkthrough.py, so it stays local.
 docs/yt-chat-walkthrough.pdf
 
 # Scratch
