@@ -1,0 +1,118 @@
+name: karpathy-deepdive
+video_url: https://youtu.be/7xTGNNLPyMI
+notes: >
+  Andrej Karpathy, "Deep Dive into LLMs like ChatGPT" (3h31m, 311 chunks,
+  auto-generated captions).  The longest video in the suite -- more than three
+  times the index size of the intro talk.  Its purpose is to test whether
+  retrieval degrades as the candidate pool grows, holding chunking and
+  embeddings constant.
+
+  GROUND TRUTH METHOD: spans located by targeted search over the full dumped
+  transcript, then confirmed by reading the surrounding passage.  Not derived
+  from retriever output, which would make the scores circular.
+
+  UNANSWERABLE CASES ARE VERIFIED BY ABSENCE: zero occurrences of "jailbreak",
+  "prompt injection", "operating system", "sentence piece", or "convolution".
+  Three of these are *answerable* in other benchmarks in this suite -- a
+  cross-video control that catches a system answering from world knowledge
+  rather than from this specific video.
+
+cases:
+  # ---- verified unanswerable ---------------------------------------------
+  - id: unans-jailbreak
+    question: What is a jailbreak attack?
+    answerable: false
+    tags: [semantic, out-of-scope, cross-video-control]
+
+  - id: unans-prompt-injection
+    question: What is a prompt injection attack?
+    answerable: false
+    tags: [lexical, out-of-scope, cross-video-control]
+
+  - id: unans-llm-os
+    question: What does the speaker mean by the LLM OS?
+    answerable: false
+    tags: [semantic, out-of-scope, cross-video-control]
+
+  - id: unans-sentencepiece
+    question: How does the SentencePiece library work?
+    answerable: false
+    tags: [lexical, out-of-scope, cross-video-control]
+
+  # ---- answerable ---------------------------------------------------------
+  - id: fineweb-dataset
+    question: What is the FineWeb dataset and how large is it?
+    expected_answer: >
+      A pretraining dataset collected and curated by Hugging Face, documented in
+      a detailed blog post. Despite covering a large crawl of the internet it
+      ends up being only about 44 terabytes of disk space.
+    relevant_spans:
+      - [0:40, 1:35]
+      - [2:05, 2:55]
+    tags: [lexical]
+
+  - id: language-filtering
+    question: How does language filtering work in the pretraining data pipeline?
+    expected_answer: >
+      A language classifier guesses the language of every web page, and only
+      pages above a threshold are kept -- FineWeb keeps pages that are more than
+      65% English, which makes the resulting model strong in English and weaker
+      elsewhere.
+    relevant_spans:
+      - [4:45, 5:40]
+    tags: [lexical, numeric]
+
+  - id: hallucination-cause
+    question: Where do hallucinations come from?
+    expected_answer: >
+      From the training set: conversations in it always confidently answer, so
+      the model learns to produce a confident answer even when it has no
+      knowledge, taking its best statistical guess instead of admitting it does
+      not know.
+    relevant_spans:
+      - [1:20:20, 1:22:00]
+    tags: [semantic]
+
+  - id: falcon-demo
+    question: What happens when Falcon 7B is asked about Orson Kovats?
+    expected_answer: >
+      It fabricates a different answer each time -- an American science fiction
+      author, a fictional character from a 1950s TV show, a former minor league
+      baseball player -- demonstrating that hallucination is statistical.
+    relevant_spans:
+      - [1:23:05, 1:24:35]
+    tags: [lexical]
+
+  - id: tokens-to-think
+    question: Why do models need tokens to think?
+    expected_answer: >
+      Computation must be distributed across many tokens rather than done in a
+      single step, so models should produce intermediate results or use tools
+      instead of relying on mental arithmetic, which is error prone.
+    relevant_spans:
+      - [1:57:40, 1:58:35]
+      - [2:00:30, 2:01:25]
+    tags: [semantic]
+
+  - id: rl-third-stage
+    question: What is reinforcement learning in the LLM training pipeline?
+    expected_answer: >
+      The third major stage after pretraining and supervised finetuning,
+      analogous to working practice problems in a textbook: the model is given
+      problems and final answers but not expert solutions, and must discover by
+      trial and error which token sequences reliably reach the answer.
+    relevant_spans:
+      - [2:09:50, 2:11:15]
+      - [2:13:05, 2:14:00]
+    tags: [semantic]
+
+  - id: deepseek-r1
+    question: Why was the DeepSeek R1 paper significant?
+    expected_answer: >
+      Because it publicly described applying reinforcement learning finetuning to
+      large language models -- something other companies had done internally but
+      never discussed openly -- and gave enough detail for others to reproduce
+      the results.
+    relevant_spans:
+      - [2:28:30, 2:30:00]
+    tags: [lexical]

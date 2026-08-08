@@ -1,0 +1,28 @@
+# Environment
+.venv/
+.env
+
+# Local cache and databases
+*.sqlite3*
+~/.yt-chat/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Evaluation output — regenerable via scripts/run_eval_queue.py and
+# scripts/sweep_chunk_size.py. Summarised results live in docs/evaluation.md.
+results/
+docs/eval_karpathy_*.md
+
+# Scratch
+benchmarks/_spans_worksheet.md

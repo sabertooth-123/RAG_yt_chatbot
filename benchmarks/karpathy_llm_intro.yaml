@@ -1,0 +1,131 @@
+name: karpathy-llm-intro
+video_url: https://youtu.be/zjkBMFhNj_g
+notes: >
+  Andrej Karpathy, "[1hr Talk] Intro to Large Language Models" (~60 min,
+  auto-generated captions, unpunctuated ASR).  Chosen deliberately: ASR text
+  with no punctuation exercises the word-window chunking path, and the talk has
+  well-defined topic boundaries that make gold spans easy to verify.
+
+  GROUND TRUTH METHOD: spans were assigned by reading the full 94-chunk
+  transcript end to end and independently locating where each answer is stated,
+  not by accepting what the retriever proposed -- which would be circular and
+  would make every score meaningless.  Spans are kept tight (30-90s) so that
+  citation precision stays informative: a wide span makes recall trivially easy
+  and drives timestamp IoU toward zero.
+
+  CAVEAT: derived from the transcript text rather than from watching the video.
+  For a talk where all information is spoken this is equivalent evidence, but
+  the spans are worth spot-checking before publishing any number from them.
+
+  Unanswerable cases are VERIFIED -- the transcript contains no occurrence of
+  "attention", "backpropagation", or "positional encoding", never states when
+  the transformer was invented, and never mentions the speaker's age.
+
+cases:
+  # ---- verified unanswerable (no spans by definition) --------------------
+  - id: unans-attention
+    question: What is the attention mechanism and how does it work?
+    answerable: false
+    tags: [semantic, out-of-scope]
+
+  - id: unans-backprop
+    question: How does backpropagation compute gradients?
+    answerable: false
+    tags: [lexical, out-of-scope]
+
+  - id: unans-year
+    question: What year was the transformer architecture invented?
+    answerable: false
+    tags: [lexical, temporal, out-of-scope]
+
+  - id: unans-speaker-age
+    question: How old is the speaker?
+    answerable: false
+    tags: [out-of-scope]
+
+  # ---- answerable --------------------------------------------------------
+  - id: llm-two-files
+    question: What two files make up a large language model?
+    expected_answer: >
+      A parameters file holding the model weights (140 GB for Llama 2 70B, two
+      bytes per parameter), and a run file containing the code that executes
+      them -- roughly 500 lines of C with no other dependencies.
+    relevant_spans:
+      - [0:30, 1:00]
+      - [1:30, 2:30]
+    tags: [lexical]
+
+  - id: llama-training-cost
+    question: How much did it cost to train Llama 2 70B and what hardware was needed?
+    expected_answer: >
+      About 6,000 GPUs running for roughly 12 days, costing around $2 million,
+      compressing about 10 TB of internet text into the parameters.
+    relevant_spans:
+      - [5:05, 5:50]
+    tags: [lexical, numeric]
+
+  - id: reversal-curse
+    question: What is the reversal curse?
+    expected_answer: >
+      Knowledge inside the model is one-directional: GPT-4 correctly answers who
+      Tom Cruise's mother is, but cannot answer who Mary Lee Pfeiffer's son is.
+    relevant_spans:
+      - [12:40, 13:35]
+    tags: [semantic]
+
+  - id: pretrain-vs-finetune
+    question: How does finetuning differ from pretraining?
+    expected_answer: >
+      Pretraining uses a huge quantity of low-quality internet text and is about
+      knowledge; finetuning uses far fewer but high-quality curated conversations
+      and is about alignment and formatting.  Pretraining costs millions and runs
+      perhaps once a year; finetuning is much cheaper and runs far more often.
+    relevant_spans:
+      - [15:50, 16:35]
+      - [17:25, 18:20]
+    tags: [semantic]
+
+  - id: llm-os
+    question: What does the speaker mean by the LLM OS?
+    expected_answer: >
+      The LLM as the kernel process of an emerging operating system, coordinating
+      memory and computational tools for problem solving, with the context window
+      acting as RAM and the internet or local files acting as disk.
+    relevant_spans:
+      - [42:30, 43:15]
+      - [43:35, 44:25]
+    tags: [semantic]
+
+  - id: prompt-injection
+    question: What is a prompt injection attack?
+    expected_answer: >
+      Hijacking the model by hiding what looks like new instructions in content
+      it reads -- for example faint white text inside an image, which ChatGPT
+      obeys as though the user had typed it.
+    relevant_spans:
+      - [51:25, 52:45]
+    tags: [lexical]
+
+  # ---- multi-turn: exercises query rewriting ------------------------------
+  - id: jailbreak-what
+    question: What is a jailbreak attack?
+    expected_answer: >
+      A prompt that pops off the model's safety training so it answers a harmful
+      query it would otherwise refuse, demonstrated with the "act as my deceased
+      grandmother" napalm example.
+    relevant_spans:
+      - [46:20, 47:20]
+    tags: [semantic]
+
+  - id: jailbreak-why
+    question: Why does that work?
+    followup_to: jailbreak-what
+    expected_answer: >
+      Roleplay fools the model into treating a harmful request as make-believe.
+      More broadly, safety refusal data is mostly English, so encodings such as
+      base64 slip past refusal behaviour the model never learned to apply there.
+    relevant_spans:
+      - [46:55, 47:30]
+      - [48:30, 49:30]
+      - [49:20, 50:10]
+    tags: [followup]

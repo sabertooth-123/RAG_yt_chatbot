@@ -1,0 +1,130 @@
+name: karpathy-tokenizer
+video_url: https://youtu.be/zduSFxRajkE
+notes: >
+  Andrej Karpathy, "Let's build the GPT Tokenizer" (2h13m, 185 chunks,
+  auto-generated captions).  Long-form counterpart to the 1-hour intro talk:
+  tests whether retrieval quality holds up when the index is twice the size and
+  the content is far more technical and repetitive (many near-identical passages
+  about encoding, merging, and vocabulary).
+
+  GROUND TRUTH METHOD: spans located by targeted search over the full dumped
+  transcript, then confirmed by reading the surrounding passage -- not by
+  accepting retriever output, which would be circular.  Spans kept tight
+  (40-100s) so timestamp IoU stays informative.
+
+  UNANSWERABLE CASES ARE VERIFIED BY ABSENCE: the transcript contains zero
+  occurrences of "reinforcement", "human feedback", "operating system", or
+  "convolution".  Note that llm-os is *answerable* in the intro-talk benchmark
+  and absent here -- a deliberate cross-video control that catches a system
+  leaning on world knowledge instead of this video's content.
+
+cases:
+  # ---- verified unanswerable ---------------------------------------------
+  - id: unans-rlhf
+    question: How does reinforcement learning from human feedback work?
+    answerable: false
+    tags: [semantic, out-of-scope]
+
+  - id: unans-llm-os
+    question: What does the speaker mean by the LLM OS?
+    answerable: false
+    tags: [semantic, out-of-scope, cross-video-control]
+
+  - id: unans-cnn
+    question: How do convolutional neural networks process images?
+    answerable: false
+    tags: [lexical, out-of-scope]
+
+  # ---- answerable ---------------------------------------------------------
+  - id: bpe-algorithm
+    question: How does the byte pair encoding algorithm work?
+    expected_answer: >
+      It iteratively finds the pair of tokens that occurs most frequently and
+      replaces that pair with a single new token, repeating to compress the
+      sequence and grow the vocabulary.
+    relevant_spans:
+      - [23:50, 24:50]
+      - [27:55, 28:45]
+    tags: [semantic]
+
+  - id: unicode-code-points
+    question: What are Unicode code points?
+    expected_answer: >
+      Definitions from the Unicode Consortium mapping roughly 150,000 characters
+      across scripts to integers; Python strings are immutable sequences of them
+      and ord() returns the code point for a character.
+    relevant_spans:
+      - [15:15, 16:50]
+    tags: [lexical]
+
+  - id: why-not-code-points
+    question: Why not just use Unicode code points directly as tokens?
+    expected_answer: >
+      The vocabulary would be very long (about 150,000 entries), and the Unicode
+      standard keeps changing, so it is not a stable representation.
+    relevant_spans:
+      - [17:25, 18:25]
+    tags: [semantic]
+
+  - id: utf-encodings
+    question: What are the three Unicode encodings and which is most common?
+    expected_answer: >
+      UTF-8, UTF-16 and UTF-32. UTF-8 is by far the most common; it is a
+      variable-length encoding of one to four bytes per code point, while UTF-32
+      is fixed length but has other downsides.
+    relevant_spans:
+      - [18:10, 19:15]
+    tags: [lexical]
+
+  - id: spelling-tokenization
+    question: Why are language models bad at spelling tasks?
+    expected_answer: >
+      Because of tokenization: too much text is crammed into a single token, so
+      the model cannot see the individual letters -- for example counting the
+      letter L in "default style", which is one token.
+    relevant_spans:
+      - [4:40, 5:35]
+      - [1:52:10, 1:53:05]
+    tags: [semantic]
+
+  - id: end-of-text-token
+    question: What is the end of text special token used for?
+    expected_answer: >
+      It delimits documents in the training set, signalling to the model that
+      what follows is unrelated to what came before.
+    relevant_spans:
+      - [1:18:40, 1:20:00]
+    tags: [lexical]
+
+  - id: sentencepiece-vs-tiktoken
+    question: How does SentencePiece differ from tiktoken?
+    expected_answer: >
+      Unlike tiktoken, SentencePiece can do both training and inference and is
+      efficient at both. It is used by the Llama and Mistral series, and it
+      works on code points rather than raw bytes.
+    relevant_spans:
+      - [1:28:35, 1:30:10]
+    tags: [lexical]
+
+  - id: vocab-size-tradeoff
+    question: What are the tradeoffs when choosing a vocabulary size?
+    expected_answer: >
+      Larger vocabularies shrink sequences so the model attends to more text, but
+      rare tokens are undertrained because they barely participate in the forward
+      and backward pass, and too much gets crammed into single tokens. In
+      practice it is an empirical hyperparameter in the high tens of thousands
+      to around 100,000.
+    relevant_spans:
+      - [1:45:45, 1:47:05]
+    tags: [semantic]
+
+  - id: solidgoldmagikarp
+    question: What is the SolidGoldMagikarp problem?
+    expected_answer: >
+      A token that appeared often in the tokenization dataset but never in the
+      language model training data, so its embedding stayed untrained. Asking
+      about it produces broken behaviour -- evasion, hallucination, or insults.
+    relevant_spans:
+      - [2:04:10, 2:06:40]
+      - [2:06:55, 2:07:50]
+    tags: [lexical]
