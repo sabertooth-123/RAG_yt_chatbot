@@ -276,13 +276,62 @@ have found by reading the code, is in [docs/evaluation.md](docs/evaluation.md).
 
 ## What doesn't work
 
+### It's tuned for lecture-style video
+
+I pointed it at a sitcom episode to see what would happen. Every question got
+refused, including reasonable ones:
+
+```
+› who is moving out
+  I cannot find this information in the video.
+
+› what are they arguing about
+  I cannot find this information in the video.
+```
+
+Not a bug — the confidence threshold is wrong for that content. `MIN_SCORE` is
+calibrated on technical talks, where a relevant passage scores 0.70–0.86 because
+the passage is genuinely *about* one topic. Sitcom dialogue isn't about anything
+in that sense. A single passage looks like this:
+
+```
+mocking me no I'm not mocking you or your beautiful G Moon what's up
+nothing Monica and I had a...
+```
+
+Four people, three subjects, no topic. I probed ten questions on that episode and
+the entire confidence range came out **0.50–0.65** — the whole distribution sits
+below a threshold set at 0.65, so nothing could ever get through.
+
+**If you're using this on conversational video** — interviews, podcasts, anything
+narrative — drop the threshold and recalibrate:
+
+```bash
+YTCHAT_MIN_SCORE=0.45
+```
+
+Then build a small benchmark from your own content and run `yt-chat eval
+calibrate` to find the real number. The sweep costs no API calls.
+
+### Summary questions don't work at all
+
+"What is this video about?" has no answer sitting in any one passage, so
+retrieval has nothing to retrieve. Ask about specific things instead. Answering
+that properly needs a different technique — summarising every chunk and merging
+the results — which isn't built.
+
+### Everything else
+
 - **Videos with subtitles turned off.** About 15% of YouTube. Would need speech
   recognition, which isn't built yet.
+- **Visual content.** The transcript is dialogue only. Anything conveyed by what's
+  on screen — physical comedy, diagrams referred to as "this bit here" — is
+  invisible to the system.
 - **Non-English videos** work through translated subtitles, but retrieval is
   noticeably worse.
 - **Small sample.** 24 answerable questions from one speaker. Differences under
-  about 0.15 in that table are one or two questions changing sides, so don't
-  read too much into them.
+  about 0.15 in that table are one or two questions changing sides, so don't read
+  too much into them.
 
 ---
 
