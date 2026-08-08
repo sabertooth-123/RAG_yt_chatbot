@@ -24,5 +24,10 @@ htmlcov/
 results/
 docs/eval_karpathy_*.md
 
+# Long-form docs kept locally, not published with the repo.
+# The PDF regenerates via scripts/build_walkthrough.py.
+docs/technical_walkthrough.md
+docs/yt-chat-walkthrough.pdf
+
 # Scratch
 benchmarks/_spans_worksheet.md
