@@ -211,6 +211,29 @@ model. Change either of those and you should re-run `eval calibrate`.
 
 ---
 
+## Experiments
+
+Every test I ran against the finished system, with the command to reproduce it.
+
+| Experiment | Command | What it does |
+|---|---|---|
+| Chunk size sweep | `python scripts/sweep_chunk_size.py` | Re-cuts each video at 400/700/1000/1500 characters and measures both recall and citation accuracy at each size. Free — no AI calls. |
+| Refusal threshold sweep | `yt-chat eval calibrate benchmarks/karpathy_llm_intro.yaml -r dense` | Sweeps the confidence cutoff from 0.00 to 1.00 and reports correct vs. wrongly refused at each step. Free — checks retrieval confidence only, never generates an answer. |
+| Retriever comparison (fast) | `yt-chat eval run benchmarks/karpathy_llm_intro.yaml --no-judge` | Compares dense, sparse, and hybrid search on one video. `--no-judge` skips AI grading, so it's free. |
+| Full comparison, all videos | `python scripts/run_eval_queue.py` | Runs every video against every search method with full AI grading. Costs real API calls — saves progress and resumes across days on a free tier. Check status with `--list`. |
+| Combine results | `python scripts/merge_eval.py --markdown` | Merges the queue's output into one results table. |
+| Draft test questions | `yt-chat eval draft https://youtu.be/VIDEO_ID -Q "your question"` | Suggests candidate time ranges for a new benchmark question. Always check them by hand before trusting them. |
+| Sanity check on new content | `yt-chat ask https://youtu.be/VIDEO_ID -Q "your question"` | How I found the threshold doesn't transfer to conversational video — ran it against a sitcom episode and every question got refused. See [What doesn't work](#what-doesnt-work). |
+| Regression check | `pytest -q` | Confirms fixed bugs — like a scoring formula that once returned 1.09 on a 0–1 scale — stay fixed. |
+
+Two more are designed but not run yet: comparing reranking on vs. off
+(`YTCHAT_ENABLE_RERANK`), and comparing the combined AI-judge call against the
+original four-separate-call version (`combined=False` in
+`evaluation/generation_metrics.py`). Both exist in the code; neither has been
+benchmarked, so I'm not claiming a result for either.
+
+---
+
 ## How it works
 
 ```
