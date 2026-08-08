@@ -1,5 +1,5 @@
 # yt-chat
-
+blog link: https://evergreen-learning-5e5.notion.site/Built-a-Youtube-Q-A-bot-that-refuses-to-guess-3accb2d4f8b4805a89e3ee559101cc11
 Ask questions about a YouTube video from your terminal. You get an answer plus
 timestamps you can click to jump to that exact moment.
 
